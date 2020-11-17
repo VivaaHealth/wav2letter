@@ -36,12 +36,12 @@ add_library(wav2letter-inference "")
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 #--- Find GFlags ---
-find_package(GFLAGS REQUIRED)
-if (GFLAGS_FOUND)
-  message(STATUS "GFLAGS found")
-else()
-  message(FATAL_ERROR "GFLAGS not found")
-endif()
+# find_package(GFLAGS REQUIRED)
+# if (GFLAGS_FOUND)
+#   message(STATUS "GFLAGS found")
+# else()
+#   message(FATAL_ERROR "GFLAGS not found")
+# endif()
 
 #--- Download and build Google test ---
 # Only if we're not building w2l tests elsewhere, else we'll
@@ -173,3 +173,33 @@ install(TARGETS wav2letter-inference
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include/wav2letter/inference
 )
+
+
+# -------------- pybind11 -----------------
+
+include(Buildpybind11)
+include(pybind11Tools)
+
+function (add_pybind11_extension ext_name)
+  pybind11_add_module(
+    ${ext_name}
+    ${CMAKE_CURRENT_SOURCE_DIR}/wav2letter/${ext_name}.cpp
+    )
+
+  target_link_libraries(
+    ${ext_name}
+    PRIVATE
+    streaming_inference_modules_nn_backend
+    streaming_inference_modules_feature
+    streaming_inference_common
+    streaming_inference_decoder
+    decoder-library
+  )
+
+  add_dependencies(
+    ${ext_name} 
+    pybind11
+    )
+endfunction ()
+
+add_pybind11_extension(_inference)

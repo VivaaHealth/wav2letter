@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  wav2letter-inference:
+    build:
+      context: .
+      dockerfile: Dockerfile-Inference
+    volumes:
+      - ./dist/:/root/dist/
+    command: cp -R /root/wav2letter/inference/dist /root

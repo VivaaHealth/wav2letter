@@ -1,0 +1,10 @@
+.dockerignore
+.circleci/
+.github/
+.gitignore
+build/
+dist/
+docker-compose.yml
+Dockerfile*
+LICENSE
+*.md

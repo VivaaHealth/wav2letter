@@ -51,31 +51,31 @@ target_link_libraries(
     Threads::Threads
 )
 
-function(build_example TARGET SRCFILE)
-  message(STATUS "Examples: add executable ${TARGET}")
-  add_executable(${TARGET}
-    ${SRCFILE}
-  )
-  add_dependencies(StreamingInferenceExamples ${TARGET})
-  target_include_directories(
-    ${TARGET}
-    PRIVATE
-      ${CMAKE_CURRENT_LIST_DIR}
-      ${GFLAGS_INCLUDE_DIRS}
-  )
-  target_link_libraries(
-    ${TARGET}
-    PRIVATE
-      streaming_inference_modules_nn_backend
-      streaming_inference_modules_feature
-      audio_to_words_example
-      ${GFLAGS_LIBRARIES}
-  )
-endfunction(build_example)
+# function(build_example TARGET SRCFILE)
+#   message(STATUS "Examples: add executable ${TARGET}")
+#   add_executable(${TARGET}
+#     ${SRCFILE}
+#   )
+#   add_dependencies(StreamingInferenceExamples ${TARGET})
+#   target_include_directories(
+#     ${TARGET}
+#     PRIVATE
+#       ${CMAKE_CURRENT_LIST_DIR}
+#       ${GFLAGS_INCLUDE_DIRS}
+#   )
+#   target_link_libraries(
+#     ${TARGET}
+#     PRIVATE
+#       streaming_inference_modules_nn_backend
+#       streaming_inference_modules_feature
+#       audio_to_words_example
+#       ${GFLAGS_LIBRARIES}
+#   )
+# endfunction(build_example)
 
-build_example(interactive_streaming_asr_example
-  ${CMAKE_CURRENT_LIST_DIR}/InteractiveStreamingASRExample.cpp)
-build_example(simple_streaming_asr_example
-  ${CMAKE_CURRENT_LIST_DIR}/SimpleStreamingASRExample.cpp)
-build_example(multithreaded_streaming_asr_example
-  ${CMAKE_CURRENT_LIST_DIR}/MultithreadedStreamingASRExample.cpp)
+# build_example(interactive_streaming_asr_example
+#   ${CMAKE_CURRENT_LIST_DIR}/InteractiveStreamingASRExample.cpp)
+# build_example(simple_streaming_asr_example
+#   ${CMAKE_CURRENT_LIST_DIR}/SimpleStreamingASRExample.cpp)
+# build_example(multithreaded_streaming_asr_example
+#   ${CMAKE_CURRENT_LIST_DIR}/MultithreadedStreamingASRExample.cpp)
