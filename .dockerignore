@@ -1,9 +1,19 @@
+# from .gitignore
+**/build
+**/dist
+**/scripts
+src/fb
+src/experimental
+**/TARGETS
+**/__pycache__
+**/*.egg-info
+**/*.cpython-*.so
+
+# others
 .dockerignore
 .circleci/
 .github/
 .gitignore
-build/
-dist/
 docker-compose.yml
 Dockerfile*
 LICENSE
