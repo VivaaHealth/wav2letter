@@ -111,3 +111,4 @@ RUN KENLM_ROOT_DIR=/root/kenlm MKLROOT=/opt/intel/mkl \
 # ------------------------------------------------------------------
 RUN pip3 install dist/*
 RUN python3 -m wav2letter.test_inference
+CMD [ "bash"]
