@@ -113,6 +113,6 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     distclass=BinaryDistribution,
-    packages=[''],
-    package_data={'': ['wav2letter/*.so']},
+    packages=find_packages(),
+    package_data={'': ['*.so']},
 )
