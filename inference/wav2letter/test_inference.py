@@ -3,7 +3,7 @@ from wav2letter import inference
 
 def print_result(result):
     print(
-        f"{result.chunk_start_time}-{result.chunk_end_time} ms: {[f'{w.word}({w.begin_time_frame})' for w in result.words]}"
+        f"{result.chunk_start_time}-{result.chunk_end_time} ms: {[f'{w.word}' for w in result.words]}"
     )
 
 
