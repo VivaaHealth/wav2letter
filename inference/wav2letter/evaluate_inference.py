@@ -17,6 +17,7 @@ local_dir = "/home/tetianamyronivska/audio"
 
 path = Path(local_dir)
 for p in path.rglob("*"):
+    print(p)
     with open(p, "rb") as f:
         f.seek(44)  # skip WAV header
         bytes = f.read(chunk_size)
@@ -31,3 +32,4 @@ for p in path.rglob("*"):
     result = inference_stream.next_result()
     inference_stream.prune()
     print_result(result)
+    break
