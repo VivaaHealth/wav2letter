@@ -3,7 +3,9 @@ from wav2letter import inference
 
 
 def print_result(result):
-    print(f"{w.word for w in result.words}")
+    print(
+        f"{result.chunk_start_time}-{result.chunk_end_time} ms: {[f'{w.word}' for w in result.words]}"
+    )
 
 
 model = inference.load_model(
@@ -17,7 +19,6 @@ local_dir = "/home/tetianamyronivska/audio"
 
 path = Path(local_dir)
 for p in path.rglob("*"):
-    print(p)
     with open(p, "rb") as f:
         f.seek(44)  # skip WAV header
         bytes = f.read(chunk_size)
