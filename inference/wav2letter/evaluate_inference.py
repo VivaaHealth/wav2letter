@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from wav2letter import inference
 
 
@@ -17,8 +17,9 @@ chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 local_dir = "/home/tetianamyronivska/audio"
 
-for fname in os.listdir(local_dir):
-    print(fname)
+path = Path(local_dir)
+for p in path.rglob(local_dir):
+    print(p)
 # with open("/home/tetianamyronivska/tds_ctc_streaming_serialized/r1.wav", "rb") as f:
 #     f.seek(44)  # skip WAV header
 #     bytes = f.read(chunk_size)
