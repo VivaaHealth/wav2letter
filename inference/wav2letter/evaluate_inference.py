@@ -18,7 +18,7 @@ chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
 local_dir = "/home/tetianamyronivska/audio"
 
 path = Path(local_dir)
-for p in path.rglob(path):
+for p in path.rglob("*"):
     print(p)
 # with open("/home/tetianamyronivska/tds_ctc_streaming_serialized/r1.wav", "rb") as f:
 #     f.seek(44)  # skip WAV header
