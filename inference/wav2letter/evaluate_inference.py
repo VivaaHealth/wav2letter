@@ -3,7 +3,7 @@ from wav2letter import inference
 
 
 def print_result(result):
-    print([w.word + " " for w in result.words])
+    print(" ".join([w.word for w in result.words]))
 
 
 model = inference.load_model(
