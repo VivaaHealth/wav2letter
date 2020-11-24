@@ -106,7 +106,7 @@ recording_ids = [
 local_path = "/home/tetianamyronivska/audio"
 
 for recording_id in recording_ids:
-    os.cmd(
+    os.system(
         f"gsutil cp gs://vivaa-staging-files/recordings/{recording_id}.wav {local_path}"
     )
 
