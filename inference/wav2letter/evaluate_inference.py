@@ -1,3 +1,4 @@
+import os
 from wav2letter import inference
 
 
@@ -16,7 +17,7 @@ chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 local_dir = "/home/tetianamyronivska/audio"
 
-for fname in local_dir:
+for fname in os.listdir(local_dir):
     print(fname)
 # with open("/home/tetianamyronivska/tds_ctc_streaming_serialized/r1.wav", "rb") as f:
 #     f.seek(44)  # skip WAV header
