@@ -36,7 +36,7 @@ for provider in providers:
             try:
                 while bytes:
                     inference_stream.submit_audio(bytes)
-                    result = inference_stream.next_result()
+                    result = inference_stream.next_result(look_back=2)
                     # inference_stream.prune()
                     bytes = f.read(chunk_size)
 
