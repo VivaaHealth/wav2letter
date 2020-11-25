@@ -20,6 +20,7 @@ providers = ["diane_snyder"]
 for provider in providers:
     test_file_path = Path(f"{local_dir}/{provider}/test.tsv")
     test_df = pd.read_csv(test_file_path)
+    print(test_df.columns)
     audio_ids = test_df["id"].tolist()
     print(audio_ids)
     # for p in path.rglob("*"):
