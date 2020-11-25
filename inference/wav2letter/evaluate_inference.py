@@ -17,12 +17,15 @@ chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 local_dir = "/home/tetianamyronivska/test_segments_by_provider"
 providers = ["diane_snyder"]
+provider_wers = []
 
 for provider in providers:
     test_file_path = Path(f"{local_dir}/{provider}/test.tsv")
     test_df = pd.read_csv(test_file_path, sep="\t")
     audio_ids = test_df["id"].tolist()
     golden_transripts = test_df["transcript"].tolist()
+    count = 0
+    errors = []
     for audio_id, golden_transcript in zip(audio_ids, golden_transripts):
         audio_path = Path(f"{local_dir}/{provider}/{audio_id}.wav")
         print(audio_path)
@@ -47,6 +50,10 @@ for provider in providers:
                 print(result)
                 print(error)
                 print("\n")
-
+                errors.append(error)
+                count += 1
             except RuntimeError:
                 continue
+    provider_wer = sum(errors) / count
+    provider_wers.append({"provider": provider, "wer": provider_wer})
+    print(provider_wers)
