@@ -37,5 +37,3 @@ for provider in providers:
                 inference_stream.prune()
                 result = " ".join([w.word for w in result.words])
                 print(result)
-                break
-        break
