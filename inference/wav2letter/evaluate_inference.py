@@ -22,7 +22,7 @@ for provider in providers:
         with open(p, "rb") as f:
             print(p)
             print(p.stem)
-            f.seek(44)  # skip WAV header
+            # f.seek(44)  # skip WAV header
             bytes = f.read(chunk_size)
             try:
                 while bytes:
