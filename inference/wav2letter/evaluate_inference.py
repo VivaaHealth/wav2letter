@@ -20,7 +20,7 @@ for provider in providers:
     for p in path.rglob("*"):
         with open(p, "rb") as f:
             print(p)
-            print(p.stem)
+            print(p.suffix)
             inference_stream = model.open_stream()
             f.seek(44)  # skip WAV header
             bytes = f.read(chunk_size)
@@ -29,7 +29,6 @@ for provider in providers:
                     inference_stream.submit_audio(bytes)
                     result = inference_stream.next_result()
                     # inference_stream.prune()
-                    # print_result(result)
                     bytes = f.read(chunk_size)
 
                 inference_stream.end_audio()
