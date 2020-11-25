@@ -19,21 +19,20 @@ providers = ["diane_snyder"]
 for provider in providers:
     path = Path(f"{local_dir}/{provider}")
     for p in path.rglob("*"):
-        if p.suffix == "wav":
-            with open(p, "rb") as f:
-                print(p)
-                print(p.stem)
-                f.seek(44)  # skip WAV header
-                bytes = f.read(chunk_size)
-                while bytes:
-                    inference_stream.submit_audio(bytes)
-                    result = inference_stream.next_result()
-                    # inference_stream.prune()
-                    # print_result(result)
-                    bytes = f.read(chunk_size)
-
-                inference_stream.end_audio()
+        with open(p, "rb") as f:
+            print(p)
+            print(p.stem)
+            f.seek(44)  # skip WAV header
+            bytes = f.read(chunk_size)
+            while bytes:
+                inference_stream.submit_audio(bytes)
                 result = inference_stream.next_result()
-                inference_stream.prune()
-                result = " ".join([w.word for w in result.words])
-                print(result)
+                # inference_stream.prune()
+                # print_result(result)
+                bytes = f.read(chunk_size)
+
+            inference_stream.end_audio()
+            result = inference_stream.next_result()
+            inference_stream.prune()
+            result = " ".join([w.word for w in result.words])
+            print(result)
