@@ -36,12 +36,12 @@ for provider in providers:
             try:
                 while bytes:
                     inference_stream.submit_audio(bytes)
-                    result = inference_stream.next_result(look_back=16000)
+                    result = inference_stream.next_result(look_back=3200)
                     # inference_stream.prune()
                     bytes = f.read(chunk_size)
 
                 inference_stream.end_audio()
-                result = inference_stream.next_result(look_back=16000)
+                result = inference_stream.next_result(look_back=3200)
                 inference_stream.prune()
                 result = " ".join([w.word for w in result.words])
                 result = result.replace("'", " ")
