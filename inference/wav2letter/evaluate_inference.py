@@ -9,7 +9,6 @@ def print_result(result):
 model = inference.load_model(
     input_files_base_path="/home/tetianamyronivska/tds_ctc_streaming_serialized"
 )
-inference_stream = model.open_stream()
 
 chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
@@ -22,7 +21,8 @@ for provider in providers:
         with open(p, "rb") as f:
             print(p)
             print(p.stem)
-            # f.seek(44)  # skip WAV header
+            inference_stream = model.open_stream()
+            f.seek(44)  # skip WAV header
             bytes = f.read(chunk_size)
             try:
                 while bytes:
