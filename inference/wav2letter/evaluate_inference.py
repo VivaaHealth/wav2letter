@@ -22,7 +22,10 @@ for provider in providers:
     test_df = pd.read_csv(test_file_path, sep="\t")
     print(test_df.columns)
     audio_ids = test_df["id"].tolist()
-    print(audio_ids)
+    golden_transripts = test_df["transcript"].tolist()
+    for audio_id, golden_transcript in zip(audio_ids, golden_transripts):
+        print(audio_id, golden_transcript)
+        break
     # for p in path.rglob("*"):
     #     with open(p, "rb") as f:
     #         print(p)
