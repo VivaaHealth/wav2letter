@@ -41,6 +41,7 @@ for provider in providers:
                 result = inference_stream.next_result()
                 inference_stream.prune()
                 result = " ".join([w.word for w in result.words])
+                result = result.replace("'", " ")
                 error = wer(golden_transcript, result)
                 print(golden_transcript)
                 print(result)
