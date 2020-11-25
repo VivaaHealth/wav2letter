@@ -5,7 +5,6 @@ from wav2letter import inference
 def print_result(result):
     print(" ".join([w.word for w in result.words]))
 
-
 model = inference.load_model(
     input_files_base_path="/home/tetianamyronivska/tds_ctc_streaming_serialized"
 )
@@ -13,7 +12,10 @@ inference_stream = model.open_stream()
 
 chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
-local_dir = "/home/tetianamyronivska/audio"
+local_dir = "/home/tetianamyronivska/test_segments_by_provider"
+providers = [
+    
+]
 
 path = Path(local_dir)
 for p in path.rglob("*"):
