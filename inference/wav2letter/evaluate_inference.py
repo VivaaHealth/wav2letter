@@ -19,7 +19,7 @@ providers = ["diane_snyder"]
 
 for provider in providers:
     test_file_path = Path(f"{local_dir}/{provider}/test.tsv")
-    test_df = pd.read_csv(test_file_path)
+    test_df = pd.read_csv(test_file_path, sep="\t")
     print(test_df.columns)
     audio_ids = test_df["id"].tolist()
     print(audio_ids)
