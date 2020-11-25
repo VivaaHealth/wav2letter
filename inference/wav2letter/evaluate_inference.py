@@ -1,5 +1,6 @@
 import pandas as pd
 
+from jiwer import wer
 from pathlib import Path
 from wav2letter import inference
 
@@ -40,6 +41,11 @@ for provider in providers:
                 result = inference_stream.next_result()
                 inference_stream.prune()
                 result = " ".join([w.word for w in result.words])
+                error = wer(golden_transcript, result)
+                print(golden_transcript)
                 print(result)
+                print(error)
+                print("\n")
+
             except RuntimeError:
                 continue
