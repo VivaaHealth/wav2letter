@@ -16,7 +16,7 @@ model = inference.load_model(
 chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 local_dir = "/home/tetianamyronivska/test_segments_by_provider"
-providers = ["crystal_berry_roberts"]
+providers = ["diane_snyder"]
 provider_wers = []
 
 for provider in providers:
