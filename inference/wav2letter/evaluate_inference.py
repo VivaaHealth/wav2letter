@@ -164,5 +164,5 @@ for provider in providers:
     provider_wer = sum(errors) / count
     provider_wers.append({"provider": provider, "wer": provider_wer})
     print(provider_wers)
-    eval_df = pd.from_dict(provider_wers)
+    eval_df = pd.DataFrame.from_dict(provider_wers)
     eval_df.to_csv("streaming_provider_evaluation.csv")
