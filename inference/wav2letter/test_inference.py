@@ -8,7 +8,7 @@ def print_result(result):
 
 
 model = inference.load_model(
-    input_files_base_path="/home/tetianamyronivska/2020_11_25_tds_ctc_serialized"
+    input_files_base_path="/local/working/dir/2020_11_25_tds_ctc_serialized"
 )
 inference_stream = model.open_stream()
 
