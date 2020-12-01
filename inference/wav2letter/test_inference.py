@@ -12,7 +12,7 @@ model = inference.load_model(
 )
 inference_stream = model.open_stream()
 
-chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
+chunk_size = 6400  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 with open(
     "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/40e9f3ac-b1b8-417d-a41c-a097ee8a5400_0.wav",
