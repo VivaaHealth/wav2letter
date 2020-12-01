@@ -159,6 +159,7 @@ for provider in providers:
                 error = wer(golden_transcript, result)
                 print(golden_transcript)
                 print(result)
+                print(result.keys())
                 print(error)
                 print("\n")
                 errors.append(error)
