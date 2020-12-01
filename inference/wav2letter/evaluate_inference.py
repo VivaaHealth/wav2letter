@@ -137,7 +137,8 @@ for provider in providers:
         audio_path = Path(f"{local_dir}/{provider}/{audio_id}.wav")
         print(audio_path)
         with open(
-            "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/40e9f3ac-b1b8-417d-a41c-a097ee8a5400_0.wav",
+            # "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/40e9f3ac-b1b8-417d-a41c-a097ee8a5400_0.wav",
+            audio_path,
             "rb",
         ) as f:
             # with open(audio_path, "rb") as f:
@@ -166,7 +167,6 @@ for provider in providers:
                 count += 1
             except RuntimeError:
                 continue
-            break
     provider_wer = sum(errors) / count
     provider_wers.append({"provider": provider, "wer": provider_wer})
     print(provider_wers)
