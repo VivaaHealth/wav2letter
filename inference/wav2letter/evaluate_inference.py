@@ -10,7 +10,7 @@ def print_result(result):
 
 
 model = inference.load_model(
-    input_files_base_path="/local/working/dir/2020_12_01_v1_tds_ctc_serialized"
+    input_files_base_path="/local/working/dir/2020_12_01_tds_ctc_serialized"
 )
 
 chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
