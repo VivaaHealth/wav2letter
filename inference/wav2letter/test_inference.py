@@ -11,11 +11,11 @@ def print_result(result):
 #     input_files_base_path="/local/working/dir/2020_11_25_tds_ctc_serialized"
 # )
 model = inference.load_model(
-    input_files_base_path="/local/working/dir/sample_serialized_model"
+    input_files_base_path="/local/working/dir/2020_11_25_tds_ctc_serialized"
 )
 inference_stream = model.open_stream()
 
-chunk_size = 6400  # 32000 = 1 sec (mobile sends chunks of 3200)
+chunk_size = 9600  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 with open(
     "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/40e9f3ac-b1b8-417d-a41c-a097ee8a5400_0.wav",
