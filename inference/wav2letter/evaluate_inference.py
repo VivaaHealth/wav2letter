@@ -13,7 +13,7 @@ model = inference.load_model(
     input_files_base_path="/local/working/dir/2020_11_25_tds_ctc_serialized"
 )
 
-chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
+chunk_size = 9600  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 local_dir = "/home/tetianamyronivska/test_segments_by_provider"
 providers = [
