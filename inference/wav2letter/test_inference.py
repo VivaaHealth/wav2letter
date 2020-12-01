@@ -11,7 +11,7 @@ def print_result(result):
 #     input_files_base_path="/local/working/dir/2020_11_25_tds_ctc_serialized"
 # )
 model = inference.load_model(
-    input_files_base_path="/local/working/dir/2020_11_25_tds_ctc_serialized"
+    input_files_base_path="/local/working/dir/tds_ctc_streaming_serialized"
 )
 inference_stream = model.open_stream()
 
