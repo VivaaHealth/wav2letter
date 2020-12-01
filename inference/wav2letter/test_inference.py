@@ -15,7 +15,7 @@ inference_stream = model.open_stream()
 chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 with open(
-    "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/99cfa168-03fd-4a91-8cdb-71f02a48ccfe_10.wav",
+    "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/40e9f3ac-b1b8-417d-a41c-a097ee8a5400_0.wav",
     "rb",
 ) as f:
     f.seek(44)  # skip WAV header
