@@ -155,7 +155,6 @@ for provider in providers:
                 inference_stream.end_audio()
                 result = inference_stream.next_result()
                 # inference_stream.prune()
-                print(result.__dict__)
                 result = " ".join([w.word for w in result.words])
                 result = result.replace("'", " ")
                 error = wer(golden_transcript, result)
