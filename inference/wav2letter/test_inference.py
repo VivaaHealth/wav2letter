@@ -26,7 +26,7 @@ with open(
     while bytes:
         inference_stream.submit_audio(bytes)
         result = inference_stream.next_result()
-        # inference_stream.prune()
+        inference_stream.prune()
         print_result(result)
         bytes = f.read(chunk_size)
 
