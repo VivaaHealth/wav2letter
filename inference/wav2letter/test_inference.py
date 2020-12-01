@@ -15,7 +15,7 @@ model = inference.load_model(
 )
 inference_stream = model.open_stream()
 
-chunk_size = 9600  # 32000 = 1 sec (mobile sends chunks of 3200)
+chunk_size = 8000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 with open(
     "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/40e9f3ac-b1b8-417d-a41c-a097ee8a5400_0.wav",
@@ -26,7 +26,7 @@ with open(
     bytes = f.read(chunk_size)
     while bytes:
         inference_stream.submit_audio(bytes)
-        result = inference_stream.next_result(look_back=3200)
+        result = inference_stream.next_result()
         # inference_stream.prune()
         # print(result)
         print_result(result)
