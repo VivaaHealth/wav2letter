@@ -35,6 +35,9 @@ with open(
 
 inference_stream.end_audio()
 result = inference_stream.next_result()
-print(result)
+print(" ".join([w.word for w in result.words]))
+print("\n")
 inference_stream.prune()
-print_result(result)
+# print_result(result)
+print(" ".join([w.word for w in result.words]))
+
