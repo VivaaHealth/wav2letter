@@ -1,3 +1,4 @@
+from timeit import default_timer as timer
 from wav2letter import inference
 
 
@@ -23,6 +24,7 @@ with open(
     "/home/tetianamyronivska/2020-12-02T19_57_02.334Z.wav",
     "rb",
 ) as f:
+    start = timer()
     f.seek(44)  # skip WAV header
     bytes = f.read(chunk_size)
     while bytes:
@@ -35,6 +37,8 @@ with open(
 
 inference_stream.end_audio()
 result = inference_stream.next_result()
+end = timer()
+print(f"Transcripttion took {end - start} seconds")
 print(" ".join([w.word for w in result.words]))
 print("\n")
 inference_stream.prune()
