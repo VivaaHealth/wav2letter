@@ -20,8 +20,8 @@ chunk_size = 8000  # 32000 = 1 sec (mobile sends chunks of 3200)
 with open(
     # "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/40e9f3ac-b1b8-417d-a41c-a097ee8a5400_0.wav",
     # "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/e9d9ad26-24fd-411d-b375-6344899229a2_1.wav",
-    "/home/tetianamyronivska/2020-12-02T19_57_02.334Z.wav"
-    "rb"
+    "/home/tetianamyronivska/2020-12-02T19_57_02.334Z.wav",
+    "rb",
 ) as f:
     f.seek(44)  # skip WAV header
     bytes = f.read(chunk_size)
