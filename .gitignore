@@ -7,3 +7,4 @@ TARGETS
 __pycache__
 *.egg-info
 *.cpython-*.so
+.DS_Store

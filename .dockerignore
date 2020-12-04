@@ -8,6 +8,7 @@ src/experimental
 **/__pycache__
 **/*.egg-info
 **/*.cpython-*.so
+**/.DS_Store
 
 # others
 .dockerignore
