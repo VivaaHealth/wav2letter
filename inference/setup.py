@@ -104,7 +104,7 @@ class BinaryDistribution(Distribution):
 
 setup(
     name="wav2letter",
-    version="0.3.0",
+    version="0.3.1",
     author="Luke Stevens",
     author_email="luke@notablehealth.com",
     description="wav2letter inference bindings for python",
