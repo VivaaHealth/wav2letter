@@ -13,55 +13,31 @@ model = inference.load_model(
     input_files_base_path="/local/working/dir/2020_12_01_v1_tds_ctc_serialized"
 )
 
-chunk_size = 32000  # 32000 = 1 sec (mobile sends chunks of 3200)
-
-previous_providers = [
-    {"provider": "aaron_dickens", "wer": 0.10376974577594185},
-    {"provider": "chealon_miller", "wer": 0.09677192446474502},
-    {"provider": "erika_wilson", "wer": 0.0590167479614311},
-    {"provider": "john_gleason", "wer": 0.09342622206390047},
-    {"provider": "maurice_goins", "wer": 0.07046911627387863},
-    {"provider": "rick_mullins", "wer": 0.07281023250676238},
-    {"provider": "shivani_beri", "wer": 0.04255785985713689},
-    {"provider": "alex_davis", "wer": 0.06174646676689433},
-    {"provider": "chris_dolan", "wer": 0.06395828192726548},
-    {"provider": "ernesto_gonzalez", "wer": 0.022614378996252404},
-    {"provider": "joseph_garcia", "wer": 0.06817703739828898},
-    {"provider": "melanie_belt", "wer": 0.07769223580307538},
-    {"provider": "robert_greenfield", "wer": 0.06318969814221573},
-    {"provider": "sindura_bandi", "wer": 0.049024252608222275},
-    {"provider": "alinda_cox", "wer": 0.028425411993879764},
-    {"provider": "christian_schupp", "wer": 0.042404010935532796},
-    {"provider": "erroll_bailey", "wer": 0.10514430423947133},
-    {"provider": "julie_grimes", "wer": 0.05338883891969492},
-    {"provider": "michael_quackenbush", "wer": 0.04426503213413474},
-    {"provider": "robert_grigg", "wer": 0.05161951363957616},
-    {"provider": "sonia_yousuf", "wer": 0.05775124186923773},
-]
+chunk_size = 16000  # 32000 = 1 sec (mobile sends chunks of 3200)
 
 local_dir = "/home/tetianamyronivska/test_segments_by_provider"
 providers = [
-    # "aaron_dickens",
-    # "chealon_miller",
-    # "erika_wilson",
-    # "john_gleason",
-    # "maurice_goins",
-    # "rick_mullins",
-    # "shivani_beri",
-    # "alex_davis",
-    # "chris_dolan",
-    # "ernesto_gonzalez",
-    # "joseph_garcia",
-    # "melanie_belt",
-    # "robert_greenfield",
-    # "sindura_bandi",
-    # "alinda_cox",
-    # "christian_schupp",
-    # "erroll_bailey",
-    # "julie_grimes",
-    # "michael_quackenbush",
-    # "robert_grigg",
-    # "sonia_yousuf",
+    "aaron_dickens",
+    "chealon_miller",
+    "erika_wilson",
+    "john_gleason",
+    "maurice_goins",
+    "rick_mullins",
+    "shivani_beri",
+    "alex_davis",
+    "chris_dolan",
+    "ernesto_gonzalez",
+    "joseph_garcia",
+    "melanie_belt",
+    "robert_greenfield",
+    "sindura_bandi",
+    "alinda_cox",
+    "christian_schupp",
+    "erroll_bailey",
+    "julie_grimes",
+    "michael_quackenbush",
+    "robert_grigg",
+    "sonia_yousuf",
     "amy_carolan",
     "christopher_bailey",
     "evander_fogle",
@@ -160,12 +136,7 @@ for provider in providers:
     for audio_id, golden_transcript in zip(audio_ids, golden_transripts):
         audio_path = Path(f"{local_dir}/{provider}/{audio_id}.wav")
         print(audio_path)
-        with open(
-            # "/home/tetianamyronivska/test_segments_by_provider/aaron_dickens/40e9f3ac-b1b8-417d-a41c-a097ee8a5400_0.wav",
-            audio_path,
-            "rb",
-        ) as f:
-            # with open(audio_path, "rb") as f:
+        with open(audio_path, "rb") as f:
             inference_stream = model.open_stream()
             f.seek(44)  # skip WAV header
             bytes = f.read(chunk_size)
@@ -195,4 +166,4 @@ for provider in providers:
     print(provider_wers)
 provider_wers.extend(previous_providers)
 eval_df = pd.DataFrame.from_dict(provider_wers)
-eval_df.to_csv("streaming_provider_evaluation.csv")
+eval_df.to_csv("streaming_provider_evaluation_500ms.csv")
