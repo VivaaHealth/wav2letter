@@ -149,7 +149,7 @@ for provider in providers:
 
                 inference_stream.end_audio()
                 result = inference_stream.next_result()
-                # inference_stream.prune()
+                inference_stream.prune()
                 result = " ".join([w.word for w in result.words])
                 result = result.replace("'", " ")
                 error = wer(golden_transcript, result)
@@ -164,6 +164,5 @@ for provider in providers:
     provider_wer = sum(errors) / (count + 0.1)
     provider_wers.append({"provider": provider, "wer": provider_wer})
     print(provider_wers)
-provider_wers.extend(previous_providers)
 eval_df = pd.DataFrame.from_dict(provider_wers)
 eval_df.to_csv("streaming_provider_evaluation_500ms.csv")
