@@ -1,30 +1,30 @@
 #include <fstream>
+#include <functional>
 #include <istream>
 #include <memory>
 #include <string>
 #include <vector>
-#include <functional>
 
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 
-#include <pybind11/pybind11.h>
 #include <pybind11/attr.h>
 #include <pybind11/functional.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 #include "inference/common/IOBuffer.h"
 #include "inference/decoder/Decoder.h"
-#include "libraries/decoder/Utils.h"
 #include "inference/module/feature/feature.h"
 #include "inference/module/module.h"
 #include "inference/module/nn/nn.h"
+#include "libraries/decoder/Utils.h"
 
 using namespace w2l;
 using namespace w2l::streaming;
 namespace py = pybind11;
 
-// -- stuff copied from inference/examples/Utils -- 
+// -- stuff copied from inference/examples/Utils --
 
 namespace cereal {
 
@@ -89,12 +89,16 @@ struct InferenceResult {
   std::vector<WordUnit> words;
   int chunk_start_time;
   int chunk_end_time;
-  InferenceResult(const std::vector<WordUnit>& wordUnits, int chunkStartTime, int chunkEndTime):
-    words(wordUnits.begin(), wordUnits.end()), chunk_start_time(chunkStartTime), chunk_end_time(chunkEndTime) {}
+  InferenceResult(
+      const std::vector<WordUnit>& wordUnits,
+      int chunkStartTime,
+      int chunkEndTime)
+      : words(wordUnits.begin(), wordUnits.end()),
+        chunk_start_time(chunkStartTime),
+        chunk_end_time(chunkEndTime) {}
 };
 
 struct InferenceStream {
-
   std::shared_ptr<Sequential> dnnModule;
   std::shared_ptr<streaming::Decoder> decoder;
   std::shared_ptr<ModuleProcessingState> input;
@@ -107,14 +111,21 @@ struct InferenceStream {
   bool isFinished;
 
   InferenceStream(
-    std::shared_ptr<Sequential> dnnModule,
-    std::shared_ptr<streaming::Decoder> decoder,
-    std::shared_ptr<ModuleProcessingState> input,
-    std::shared_ptr<ModuleProcessingState> output,
-    int nTokens
-  ) : dnnModule(dnnModule), decoder(decoder), input(input), output(output), nTokens(nTokens),
-    audioSampleCount(0), pendingSampleCount(0), isFinished(false),
-    inputBuffer(input->buffer(0)), outputBuffer(output->buffer(0)) {}
+      std::shared_ptr<Sequential> dnnModule,
+      std::shared_ptr<streaming::Decoder> decoder,
+      std::shared_ptr<ModuleProcessingState> input,
+      std::shared_ptr<ModuleProcessingState> output,
+      int nTokens)
+      : dnnModule(dnnModule),
+        decoder(decoder),
+        input(input),
+        output(output),
+        nTokens(nTokens),
+        audioSampleCount(0),
+        pendingSampleCount(0),
+        isFinished(false),
+        inputBuffer(input->buffer(0)),
+        outputBuffer(output->buffer(0)) {}
 
   virtual void submit_audio(const py::bytes& audio) {
     if (isFinished) {
@@ -126,21 +137,24 @@ struct InferenceStream {
     if (bytesLen % sizeof(int16_t)) {
       throw std::runtime_error("Odd number of audio bytes submitted");
     }
-    if (!bytesLen) return;
+    if (!bytesLen)
+      return;
     auto srcPtr = reinterpret_cast<const int16_t*>(bytesBuffer);
     const int sampleCount = bytesLen / sizeof(int16_t);
     inputBuffer->ensure<float>(sampleCount);
     float* bufferPtr = inputBuffer->tail<float>();
-    std::transform(srcPtr, srcPtr + sampleCount, bufferPtr, [](int16_t i) -> float {
-        return static_cast<float>(i) / kMaxUint16;
-      });
+    std::transform(
+        srcPtr, srcPtr + sampleCount, bufferPtr, [](int16_t i) -> float {
+          return static_cast<float>(i) / kMaxUint16;
+        });
     inputBuffer->move<float>(sampleCount);
     pendingSampleCount += sampleCount;
     dnnModule->run(input);
   }
 
   virtual void end_audio() {
-    if (isFinished) return;
+    if (isFinished)
+      return;
     isFinished = true;
     dnnModule->finish(input);
   }
@@ -159,67 +173,64 @@ struct InferenceStream {
         (audioSampleCount / (kAudioWavSamplingFrequency / 1000));
     const int chunk_end_ms =
         ((audioSampleCount + pendingSampleCount) /
-        (kAudioWavSamplingFrequency / 1000));
+         (kAudioWavSamplingFrequency / 1000));
     audioSampleCount += pendingSampleCount;
     pendingSampleCount = 0;
     // Consume and prune
     const int nFramesOut = outputBuffer->size<float>() / nTokens;
     outputBuffer->consume<float>(nFramesOut * nTokens);
-    return std::unique_ptr<InferenceResult>(new InferenceResult(words, chunk_start_ms, chunk_end_ms));
+    return std::unique_ptr<InferenceResult>(
+        new InferenceResult(words, chunk_start_ms, chunk_end_ms));
   }
 
   virtual void prune(int lookBack = 0) {
     decoder->prune(lookBack);
   }
-
 };
 
 struct Model {
-
   std::shared_ptr<Sequential> dnnModule;
-  std::shared_ptr<const DecoderFactory> decoderFactory;
-  std::shared_ptr<const DecoderOptions> decoderOptions;
+  std::shared_ptr<streaming::Decoder> decoder;
   int nTokens;
 
   Model(
-    std::shared_ptr<Sequential> dnnModule,
-    std::shared_ptr<const DecoderFactory> decoderFactory,
-    std::shared_ptr<const DecoderOptions> decoderOptions,
-    int nTokens
-  ) : dnnModule(dnnModule), decoderFactory(decoderFactory), decoderOptions(decoderOptions), nTokens(nTokens) {}
+      std::shared_ptr<Sequential> dnnModule,
+      std::shared_ptr<streaming::Decoder> decoder,
+      int nTokens)
+      : dnnModule(dnnModule), decoder(decoder), nTokens(nTokens) {}
 
   virtual std::unique_ptr<InferenceStream> open_stream() {
-    auto decoder = std::make_shared<streaming::Decoder>(decoderFactory->createDecoder(*decoderOptions));
     auto input = std::make_shared<ModuleProcessingState>(1);
     auto output = dnnModule->start(input);
     decoder->start();
-    return std::unique_ptr<InferenceStream>(new InferenceStream(dnnModule, decoder, input, output, nTokens));
+    return std::unique_ptr<InferenceStream>(
+        new InferenceStream(dnnModule, decoder, input, output, nTokens));
   }
-  
 };
 
 std::unique_ptr<Model> load_model(
-  const std::string& input_files_base_path,
-  const std::string& feature_module_file,
-  const std::string& acoustic_module_file,
-  const std::string& tokens_file,
-  const std::string& decoder_options_file,
-  const std::string& lexicon_file,
-  const std::string& language_model_file,
-  const std::string& transitions_file,
-  const std::string& silence_token
-) {
+    const std::string& input_files_base_path,
+    const std::string& feature_module_file,
+    const std::string& acoustic_module_file,
+    const std::string& tokens_file,
+    const std::string& decoder_options_file,
+    const std::string& lexicon_file,
+    const std::string& language_model_file,
+    const std::string& transitions_file,
+    const std::string& silence_token) {
   std::shared_ptr<streaming::Sequential> featureModule;
   std::shared_ptr<streaming::Sequential> acousticModule;
 
   // Read files
   {
     std::ifstream featFile(
-        GetFullPath(feature_module_file, input_files_base_path), std::ios::binary);
+        GetFullPath(feature_module_file, input_files_base_path),
+        std::ios::binary);
     if (!featFile.is_open()) {
       throw std::runtime_error(
           "failed to open feature file=" +
-          GetFullPath(feature_module_file, input_files_base_path) + " for reading");
+          GetFullPath(feature_module_file, input_files_base_path) +
+          " for reading");
     }
     cereal::BinaryInputArchive ar(featFile);
     ar(featureModule);
@@ -227,11 +238,13 @@ std::unique_ptr<Model> load_model(
 
   {
     std::ifstream amFile(
-        GetFullPath(acoustic_module_file, input_files_base_path), std::ios::binary);
+        GetFullPath(acoustic_module_file, input_files_base_path),
+        std::ios::binary);
     if (!amFile.is_open()) {
       throw std::runtime_error(
           "failed to open acoustic model file=" +
-          GetFullPath(acoustic_module_file, input_files_base_path) + " for reading");
+          GetFullPath(acoustic_module_file, input_files_base_path) +
+          " for reading");
     }
     cereal::BinaryInputArchive ar(amFile);
     ar(acousticModule);
@@ -264,7 +277,8 @@ std::unique_ptr<Model> load_model(
     if (!decoderOptionsFile.is_open()) {
       throw std::runtime_error(
           "failed to open decoder options file=" +
-          GetFullPath(decoder_options_file, input_files_base_path) + " for reading");
+          GetFullPath(decoder_options_file, input_files_base_path) +
+          " for reading");
     }
     cereal::JSONInputArchive ar(decoderOptionsFile);
     ar(cereal::make_nvp("beamSize", decoderOptions->beamSize),
@@ -286,7 +300,8 @@ std::unique_ptr<Model> load_model(
     if (!transitionsFile.is_open()) {
       throw std::runtime_error(
           "failed to open transition parameter file=" +
-          GetFullPath(transitions_file, input_files_base_path) + " for reading");
+          GetFullPath(transitions_file, input_files_base_path) +
+          " for reading");
     }
     cereal::BinaryInputArchive ar(transitionsFile);
     ar(transitions);
@@ -303,12 +318,14 @@ std::unique_ptr<Model> load_model(
         silence_token,
         0);
   }
+  auto decoder = std::make_shared<streaming::Decoder>();
+  { decoder = decoderFactory->createDecoder(*decoderOptions) }
 
-  return std::unique_ptr<Model>(new Model(dnnModule, decoderFactory, decoderOptions, nTokens));
+  return std::unique_ptr<Model>(new Model(dnnModule, decoder, nTokens));
 }
 
 PYBIND11_MODULE(_inference, m) {
-    m.doc() = R"pbdoc(
+  m.doc() = R"pbdoc(
         wav2letter streaming inference for Python
         -----------------------------------------
 
@@ -320,56 +337,62 @@ PYBIND11_MODULE(_inference, m) {
            load_model
     )pbdoc";
 
-    py::class_<WordUnit>(m, "WordUnit", py::is_final())
-        .def_readwrite("word", &WordUnit::word)
-        .def_readwrite("begin_time_frame", &WordUnit::beginTimeFrame)
-        .def_readwrite("end_time_frame", &WordUnit::endTimeFrame);
+  py::class_<WordUnit>(m, "WordUnit", py::is_final())
+      .def_readwrite("word", &WordUnit::word)
+      .def_readwrite("begin_time_frame", &WordUnit::beginTimeFrame)
+      .def_readwrite("end_time_frame", &WordUnit::endTimeFrame);
 
-    py::class_<InferenceResult>(m, "InferenceResult", py::is_final())
-        .def_readwrite("words", &InferenceResult::words)
-        .def_readwrite("chunk_start_time", &InferenceResult::chunk_start_time)
-        .def_readwrite("chunk_end_time", &InferenceResult::chunk_end_time);
-    
-    py::class_<InferenceStream>(m, "InferenceStream", py::is_final())
-        .def("submit_audio", &InferenceStream::submit_audio,
-            "Submit additional audio bytes (PCM, 16-bit mono 16 kHz without WAV header)",
-            py::arg("audio")
-        )
-        .def("end_audio", &InferenceStream::end_audio,
-            "Call when there are no more audio bytes in order to finish"
-        )
-        .def("next_result", &InferenceStream::next_result,
-            "Run inference to obtain further ASR results since the last time this was called",
-            py::arg("look_back") = 0
-        )
-        .def("prune", &InferenceStream::prune,
-            "Prune the decoder's hypothesis space",
-            py::arg("look_back") = 0
-        );
+  py::class_<InferenceResult>(m, "InferenceResult", py::is_final())
+      .def_readwrite("words", &InferenceResult::words)
+      .def_readwrite("chunk_start_time", &InferenceResult::chunk_start_time)
+      .def_readwrite("chunk_end_time", &InferenceResult::chunk_end_time);
 
-    py::class_<Model>(m, "Model", py::is_final())
-        .def("open_stream", &Model::open_stream,
-            "Stream inference from the specified audio file"
-        );
+  py::class_<InferenceStream>(m, "InferenceStream", py::is_final())
+      .def(
+          "submit_audio",
+          &InferenceStream::submit_audio,
+          "Submit additional audio bytes (PCM, 16-bit mono 16 kHz without WAV header)",
+          py::arg("audio"))
+      .def(
+          "end_audio",
+          &InferenceStream::end_audio,
+          "Call when there are no more audio bytes in order to finish")
+      .def(
+          "next_result",
+          &InferenceStream::next_result,
+          "Run inference to obtain further ASR results since the last time this was called",
+          py::arg("look_back") = 0)
+      .def(
+          "prune",
+          &InferenceStream::prune,
+          "Prune the decoder's hypothesis space",
+          py::arg("look_back") = 0);
 
-    m.def("load_model", &load_model, R"pbdoc(
+  py::class_<Model>(m, "Model", py::is_final())
+      .def(
+          "open_stream",
+          &Model::open_stream,
+          "Stream inference from the specified audio file");
+
+  m.def(
+      "load_model",
+      &load_model,
+      R"pbdoc(
         Load model from the specified files
         )pbdoc",
-        py::arg("input_files_base_path") = ".",
-        py::arg("feature_module_file") = "feature_extractor.bin",
-        py::arg("acoustic_module_file") = "acoustic_model.bin",
-        py::arg("tokens_file") = "tokens.txt",
-        py::arg("decoder_options_file") = "decoder_options.json",
-        py::arg("lexicon_file") = "lexicon.txt",
-        py::arg("language_model_file") = "language_model.bin",
-        py::arg("transitions_file") = "",
-        py::arg("silence_token") = "_"
-    );
+      py::arg("input_files_base_path") = ".",
+      py::arg("feature_module_file") = "feature_extractor.bin",
+      py::arg("acoustic_module_file") = "acoustic_model.bin",
+      py::arg("tokens_file") = "tokens.txt",
+      py::arg("decoder_options_file") = "decoder_options.json",
+      py::arg("lexicon_file") = "lexicon.txt",
+      py::arg("language_model_file") = "language_model.bin",
+      py::arg("transitions_file") = "",
+      py::arg("silence_token") = "_");
 
 #ifdef VERSION_INFO
-    m.attr("__version__") = VERSION_INFO;
+  m.attr("__version__") = VERSION_INFO;
 #else
-    m.attr("__version__") = "dev";
+  m.attr("__version__") = "dev";
 #endif
 }
-
