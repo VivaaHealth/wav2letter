@@ -104,11 +104,12 @@ COPY audio/ /root/audio
 COPY . /root/wav2letter/
 WORKDIR /root/wav2letter/inference
 RUN KENLM_ROOT_DIR=/root/kenlm MKLROOT=/opt/intel/mkl \
+    pip3 install -e .
+RUN KENLM_ROOT_DIR=/root/kenlm MKLROOT=/opt/intel/mkl \
     python3 setup.py bdist_wheel
 
 # ==================================================================
 # test
 # ------------------------------------------------------------------
 RUN pip3 install dist/*
-RUN python3 -m wav2letter.test_inference
-CMD [ "bash"]
+RUN python3 wav2letter/test_inference.py

@@ -154,9 +154,8 @@ void LexiconDecoder::decodeStep(const float* emissions, int T, int N) {
       }
 
       /* (2) Try same lexicon node */
-      if (opt_.criterionType != CriterionType::CTC || !prevHyp.prevBlank ||
-          prevLex == lexicon_->getRoot()) {
-        int n = prevLex == lexicon_->getRoot() ? sil_ : prevIdx;
+      if (opt_.criterionType != CriterionType::CTC || !prevHyp.prevBlank) {
+        int n = prevIdx;
         double amScore = emissions[t * N + n];
         if (nDecodedFrames_ + t > 0 &&
             opt_.criterionType == CriterionType::ASG) {
