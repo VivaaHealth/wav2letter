@@ -175,6 +175,7 @@ struct InferenceStream {
 };
 
 struct Model {
+
   std::shared_ptr<Sequential> dnnModule;
   std::shared_ptr<streaming::Decoder> decoder;
   int nTokens;
@@ -203,20 +204,19 @@ std::unique_ptr<Model> load_model(
     const std::string& lexicon_file,
     const std::string& language_model_file,
     const std::string& transitions_file,
-    const std::string& silence_token) {
+    const std::string& silence_token
+) {
   std::shared_ptr<streaming::Sequential> featureModule;
   std::shared_ptr<streaming::Sequential> acousticModule;
 
   // Read files
   {
     std::ifstream featFile(
-        GetFullPath(feature_module_file, input_files_base_path),
-        std::ios::binary);
+        GetFullPath(feature_module_file, input_files_base_path), std::ios::binary);
     if (!featFile.is_open()) {
       throw std::runtime_error(
           "failed to open feature file=" +
-          GetFullPath(feature_module_file, input_files_base_path) +
-          " for reading");
+          GetFullPath(feature_module_file, input_files_base_path) + " for reading");
     }
     cereal::BinaryInputArchive ar(featFile);
     ar(featureModule);
@@ -224,13 +224,11 @@ std::unique_ptr<Model> load_model(
 
   {
     std::ifstream amFile(
-        GetFullPath(acoustic_module_file, input_files_base_path),
-        std::ios::binary);
+        GetFullPath(acoustic_module_file, input_files_base_path), std::ios::binary);
     if (!amFile.is_open()) {
       throw std::runtime_error(
           "failed to open acoustic model file=" +
-          GetFullPath(acoustic_module_file, input_files_base_path) +
-          " for reading");
+          GetFullPath(acoustic_module_file, input_files_base_path) + " for reading");
     }
     cereal::BinaryInputArchive ar(amFile);
     ar(acousticModule);
@@ -263,8 +261,7 @@ std::unique_ptr<Model> load_model(
     if (!decoderOptionsFile.is_open()) {
       throw std::runtime_error(
           "failed to open decoder options file=" +
-          GetFullPath(decoder_options_file, input_files_base_path) +
-          " for reading");
+          GetFullPath(decoder_options_file, input_files_base_path) + " for reading");
     }
     cereal::JSONInputArchive ar(decoderOptionsFile);
     ar(cereal::make_nvp("beamSize", decoderOptions->beamSize),
@@ -286,8 +283,7 @@ std::unique_ptr<Model> load_model(
     if (!transitionsFile.is_open()) {
       throw std::runtime_error(
           "failed to open transition parameter file=" +
-          GetFullPath(transitions_file, input_files_base_path) +
-          " for reading");
+          GetFullPath(transitions_file, input_files_base_path) + " for reading");
     }
     cereal::BinaryInputArchive ar(transitionsFile);
     ar(transitions);
