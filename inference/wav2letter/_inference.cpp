@@ -192,19 +192,18 @@ struct Model {
     decoder->start();
     return std::unique_ptr<InferenceStream>(new InferenceStream(dnnModule, decoder, input, output, nTokens));
   }
-
 };
 
 std::unique_ptr<Model> load_model(
-    const std::string& input_files_base_path,
-    const std::string& feature_module_file,
-    const std::string& acoustic_module_file,
-    const std::string& tokens_file,
-    const std::string& decoder_options_file,
-    const std::string& lexicon_file,
-    const std::string& language_model_file,
-    const std::string& transitions_file,
-    const std::string& silence_token
+  const std::string& input_files_base_path,
+  const std::string& feature_module_file,
+  const std::string& acoustic_module_file,
+  const std::string& tokens_file,
+  const std::string& decoder_options_file,
+  const std::string& lexicon_file,
+  const std::string& language_model_file,
+  const std::string& transitions_file,
+  const std::string& silence_token
 ) {
   std::shared_ptr<streaming::Sequential> featureModule;
   std::shared_ptr<streaming::Sequential> acousticModule;
