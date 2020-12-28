@@ -190,9 +190,9 @@ struct Model {
     auto input = std::make_shared<ModuleProcessingState>(1);
     auto output = dnnModule->start(input);
     decoder->start();
-    return std::unique_ptr<InferenceStream>(
-        new InferenceStream(dnnModule, decoder, input, output, nTokens));
+    return std::unique_ptr<InferenceStream>(new InferenceStream(dnnModule, decoder, input, output, nTokens));
   }
+
 };
 
 std::unique_ptr<Model> load_model(
@@ -311,74 +311,64 @@ std::unique_ptr<Model> load_model(
 }
 
 PYBIND11_MODULE(_inference, m) {
-  m.doc() = R"pbdoc(
+    m.doc() = R"pbdoc(
         wav2letter streaming inference for Python
         -----------------------------------------
-
         .. currentmodule:: inference
-
         .. autosummary::
            :toctree: _generate
-
            load_model
     )pbdoc";
 
-  py::class_<WordUnit>(m, "WordUnit", py::is_final())
-      .def_readwrite("word", &WordUnit::word)
-      .def_readwrite("begin_time_frame", &WordUnit::beginTimeFrame)
-      .def_readwrite("end_time_frame", &WordUnit::endTimeFrame);
+    py::class_<WordUnit>(m, "WordUnit", py::is_final())
+        .def_readwrite("word", &WordUnit::word)
+        .def_readwrite("begin_time_frame", &WordUnit::beginTimeFrame)
+        .def_readwrite("end_time_frame", &WordUnit::endTimeFrame);
 
-  py::class_<InferenceResult>(m, "InferenceResult", py::is_final())
-      .def_readwrite("words", &InferenceResult::words)
-      .def_readwrite("chunk_start_time", &InferenceResult::chunk_start_time)
-      .def_readwrite("chunk_end_time", &InferenceResult::chunk_end_time);
+    py::class_<InferenceResult>(m, "InferenceResult", py::is_final())
+        .def_readwrite("words", &InferenceResult::words)
+        .def_readwrite("chunk_start_time", &InferenceResult::chunk_start_time)
+        .def_readwrite("chunk_end_time", &InferenceResult::chunk_end_time);
+    
+    py::class_<InferenceStream>(m, "InferenceStream", py::is_final())
+        .def("submit_audio", &InferenceStream::submit_audio,
+            "Submit additional audio bytes (PCM, 16-bit mono 16 kHz without WAV header)",
+            py::arg("audio")
+        )
+        .def("end_audio", &InferenceStream::end_audio,
+            "Call when there are no more audio bytes in order to finish"
+        )
+        .def("next_result", &InferenceStream::next_result,
+            "Run inference to obtain further ASR results since the last time this was called",
+            py::arg("look_back") = 0
+        )
+        .def("prune", &InferenceStream::prune,
+            "Prune the decoder's hypothesis space",
+            py::arg("look_back") = 0
+        );
 
-  py::class_<InferenceStream>(m, "InferenceStream", py::is_final())
-      .def(
-          "submit_audio",
-          &InferenceStream::submit_audio,
-          "Submit additional audio bytes (PCM, 16-bit mono 16 kHz without WAV header)",
-          py::arg("audio"))
-      .def(
-          "end_audio",
-          &InferenceStream::end_audio,
-          "Call when there are no more audio bytes in order to finish")
-      .def(
-          "next_result",
-          &InferenceStream::next_result,
-          "Run inference to obtain further ASR results since the last time this was called",
-          py::arg("look_back") = 0)
-      .def(
-          "prune",
-          &InferenceStream::prune,
-          "Prune the decoder's hypothesis space",
-          py::arg("look_back") = 0);
+    py::class_<Model>(m, "Model", py::is_final())
+        .def("open_stream", &Model::open_stream,
+            "Stream inference from the specified audio file"
+        );
 
-  py::class_<Model>(m, "Model", py::is_final())
-      .def(
-          "open_stream",
-          &Model::open_stream,
-          "Stream inference from the specified audio file");
-
-  m.def(
-      "load_model",
-      &load_model,
-      R"pbdoc(
+    m.def("load_model", &load_model, R"pbdoc(
         Load model from the specified files
         )pbdoc",
-      py::arg("input_files_base_path") = ".",
-      py::arg("feature_module_file") = "feature_extractor.bin",
-      py::arg("acoustic_module_file") = "acoustic_model.bin",
-      py::arg("tokens_file") = "tokens.txt",
-      py::arg("decoder_options_file") = "decoder_options.json",
-      py::arg("lexicon_file") = "lexicon.txt",
-      py::arg("language_model_file") = "language_model.bin",
-      py::arg("transitions_file") = "",
-      py::arg("silence_token") = "_");
+        py::arg("input_files_base_path") = ".",
+        py::arg("feature_module_file") = "feature_extractor.bin",
+        py::arg("acoustic_module_file") = "acoustic_model.bin",
+        py::arg("tokens_file") = "tokens.txt",
+        py::arg("decoder_options_file") = "decoder_options.json",
+        py::arg("lexicon_file") = "lexicon.txt",
+        py::arg("language_model_file") = "language_model.bin",
+        py::arg("transitions_file") = "",
+        py::arg("silence_token") = "_"
+    );
 
 #ifdef VERSION_INFO
-  m.attr("__version__") = VERSION_INFO;
+    m.attr("__version__") = VERSION_INFO;
 #else
-  m.attr("__version__") = "dev";
+    m.attr("__version__") = "dev";
 #endif
 }
