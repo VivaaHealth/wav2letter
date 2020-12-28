@@ -183,8 +183,8 @@ struct Model {
   Model(
       std::shared_ptr<Sequential> dnnModule,
       std::shared_ptr<streaming::Decoder> decoder,
-      int nTokens)
-      : dnnModule(dnnModule), decoder(decoder), nTokens(nTokens) {}
+      int nTokens
+  ) : dnnModule(dnnModule), decoder(decoder), nTokens(nTokens) {}
 
   virtual std::unique_ptr<InferenceStream> open_stream() {
     auto input = std::make_shared<ModuleProcessingState>(1);
@@ -314,9 +314,12 @@ PYBIND11_MODULE(_inference, m) {
     m.doc() = R"pbdoc(
         wav2letter streaming inference for Python
         -----------------------------------------
+
         .. currentmodule:: inference
+
         .. autosummary::
            :toctree: _generate
+
            load_model
     )pbdoc";
 
