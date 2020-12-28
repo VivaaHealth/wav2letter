@@ -144,7 +144,6 @@ for provider in providers:
                 while bytes:
                     inference_stream.submit_audio(bytes)
                     result = inference_stream.next_result()
-                    # inference_stream.prune()
                     bytes = f.read(chunk_size)
 
                 inference_stream.end_audio()
@@ -163,6 +162,5 @@ for provider in providers:
                 continue
     provider_wer = sum(errors) / (count + 0.1)
     provider_wers.append({"provider": provider, "wer": provider_wer})
-    print(provider_wers)
 eval_df = pd.DataFrame.from_dict(provider_wers)
 eval_df.to_csv("streaming_provider_evaluation_500ms.csv")
