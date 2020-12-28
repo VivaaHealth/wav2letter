@@ -1,30 +1,30 @@
 #include <fstream>
-#include <functional>
 #include <istream>
 #include <memory>
 #include <string>
 #include <vector>
+#include <functional>
 
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 
+#include <pybind11/pybind11.h>
 #include <pybind11/attr.h>
 #include <pybind11/functional.h>
-#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 #include "inference/common/IOBuffer.h"
 #include "inference/decoder/Decoder.h"
+#include "libraries/decoder/Utils.h"
 #include "inference/module/feature/feature.h"
 #include "inference/module/module.h"
 #include "inference/module/nn/nn.h"
-#include "libraries/decoder/Utils.h"
 
 using namespace w2l;
 using namespace w2l::streaming;
 namespace py = pybind11;
 
-// -- stuff copied from inference/examples/Utils --
+// -- stuff copied from inference/examples/Utils -- 
 
 namespace cereal {
 
@@ -318,8 +318,12 @@ std::unique_ptr<Model> load_model(
         silence_token,
         0);
   }
-  auto decoder = std::make_shared<streaming::Decoder>();
-  { decoder = decoderFactory->createDecoder(*decoderOptions) }
+
+  std::shared_ptr<streaming::Decoder> decoder;
+  {
+    decoder = std::make_shared<streaming::Decoder>(
+        decoderFactory->createDecoder(*decoderOptions));
+  }
 
   return std::unique_ptr<Model>(new Model(dnnModule, decoder, nTokens));
 }
