@@ -89,16 +89,12 @@ struct InferenceResult {
   std::vector<WordUnit> words;
   int chunk_start_time;
   int chunk_end_time;
-  InferenceResult(
-      const std::vector<WordUnit>& wordUnits,
-      int chunkStartTime,
-      int chunkEndTime)
-      : words(wordUnits.begin(), wordUnits.end()),
-        chunk_start_time(chunkStartTime),
-        chunk_end_time(chunkEndTime) {}
+  InferenceResult(const std::vector<WordUnit>& wordUnits, int chunkStartTime, int chunkEndTime):
+    words(wordUnits.begin(), wordUnits.end()), chunk_start_time(chunkStartTime), chunk_end_time(chunkEndTime) {}
 };
 
 struct InferenceStream {
+
   std::shared_ptr<Sequential> dnnModule;
   std::shared_ptr<streaming::Decoder> decoder;
   std::shared_ptr<ModuleProcessingState> input;
@@ -111,21 +107,14 @@ struct InferenceStream {
   bool isFinished;
 
   InferenceStream(
-      std::shared_ptr<Sequential> dnnModule,
-      std::shared_ptr<streaming::Decoder> decoder,
-      std::shared_ptr<ModuleProcessingState> input,
-      std::shared_ptr<ModuleProcessingState> output,
-      int nTokens)
-      : dnnModule(dnnModule),
-        decoder(decoder),
-        input(input),
-        output(output),
-        nTokens(nTokens),
-        audioSampleCount(0),
-        pendingSampleCount(0),
-        isFinished(false),
-        inputBuffer(input->buffer(0)),
-        outputBuffer(output->buffer(0)) {}
+    std::shared_ptr<Sequential> dnnModule,
+    std::shared_ptr<streaming::Decoder> decoder,
+    std::shared_ptr<ModuleProcessingState> input,
+    std::shared_ptr<ModuleProcessingState> output,
+    int nTokens
+  ) : dnnModule(dnnModule), decoder(decoder), input(input), output(output), nTokens(nTokens),
+    audioSampleCount(0), pendingSampleCount(0), isFinished(false),
+    inputBuffer(input->buffer(0)), outputBuffer(output->buffer(0)) {}
 
   virtual void submit_audio(const py::bytes& audio) {
     if (isFinished) {
@@ -137,24 +126,21 @@ struct InferenceStream {
     if (bytesLen % sizeof(int16_t)) {
       throw std::runtime_error("Odd number of audio bytes submitted");
     }
-    if (!bytesLen)
-      return;
+    if (!bytesLen) return;
     auto srcPtr = reinterpret_cast<const int16_t*>(bytesBuffer);
     const int sampleCount = bytesLen / sizeof(int16_t);
     inputBuffer->ensure<float>(sampleCount);
     float* bufferPtr = inputBuffer->tail<float>();
-    std::transform(
-        srcPtr, srcPtr + sampleCount, bufferPtr, [](int16_t i) -> float {
-          return static_cast<float>(i) / kMaxUint16;
-        });
+    std::transform(srcPtr, srcPtr + sampleCount, bufferPtr, [](int16_t i) -> float {
+        return static_cast<float>(i) / kMaxUint16;
+      });
     inputBuffer->move<float>(sampleCount);
     pendingSampleCount += sampleCount;
     dnnModule->run(input);
   }
 
   virtual void end_audio() {
-    if (isFinished)
-      return;
+    if (isFinished) return;
     isFinished = true;
     dnnModule->finish(input);
   }
@@ -173,19 +159,19 @@ struct InferenceStream {
         (audioSampleCount / (kAudioWavSamplingFrequency / 1000));
     const int chunk_end_ms =
         ((audioSampleCount + pendingSampleCount) /
-         (kAudioWavSamplingFrequency / 1000));
+        (kAudioWavSamplingFrequency / 1000));
     audioSampleCount += pendingSampleCount;
     pendingSampleCount = 0;
     // Consume and prune
     const int nFramesOut = outputBuffer->size<float>() / nTokens;
     outputBuffer->consume<float>(nFramesOut * nTokens);
-    return std::unique_ptr<InferenceResult>(
-        new InferenceResult(words, chunk_start_ms, chunk_end_ms));
+    return std::unique_ptr<InferenceResult>(new InferenceResult(words, chunk_start_ms, chunk_end_ms));
   }
 
   virtual void prune(int lookBack = 0) {
     decoder->prune(lookBack);
   }
+
 };
 
 struct Model {
