@@ -177,25 +177,21 @@ struct InferenceStream {
 struct Model {
 
   std::shared_ptr<Sequential> dnnModule;
-  std::shared_ptr<const DecoderFactory> decoderFactory;
-  std::shared_ptr<const DecoderOptions> decoderOptions;
+  std::shared_ptr<streaming::Decoder> decoder;
   int nTokens;
 
   Model(
-    std::shared_ptr<Sequential> dnnModule,
-    std::shared_ptr<const DecoderFactory> decoderFactory,
-    std::shared_ptr<const DecoderOptions> decoderOptions,
-    int nTokens
-  ) : dnnModule(dnnModule), decoderFactory(decoderFactory), decoderOptions(decoderOptions), nTokens(nTokens) {}
+      std::shared_ptr<Sequential> dnnModule,
+      std::shared_ptr<streaming::Decoder> decoder,
+      int nTokens
+  ) : dnnModule(dnnModule), decoder(decoder), nTokens(nTokens) {}
 
   virtual std::unique_ptr<InferenceStream> open_stream() {
-    auto decoder = std::make_shared<streaming::Decoder>(decoderFactory->createDecoder(*decoderOptions));
     auto input = std::make_shared<ModuleProcessingState>(1);
     auto output = dnnModule->start(input);
     decoder->start();
     return std::unique_ptr<InferenceStream>(new InferenceStream(dnnModule, decoder, input, output, nTokens));
   }
-  
 };
 
 std::unique_ptr<Model> load_model(
@@ -304,7 +300,13 @@ std::unique_ptr<Model> load_model(
         0);
   }
 
-  return std::unique_ptr<Model>(new Model(dnnModule, decoderFactory, decoderOptions, nTokens));
+  std::shared_ptr<streaming::Decoder> decoder;
+  {
+    decoder = std::make_shared<streaming::Decoder>(
+        decoderFactory->createDecoder(*decoderOptions));
+  }
+
+  return std::unique_ptr<Model>(new Model(dnnModule, decoder, nTokens));
 }
 
 PYBIND11_MODULE(_inference, m) {
@@ -372,4 +374,3 @@ PYBIND11_MODULE(_inference, m) {
     m.attr("__version__") = "dev";
 #endif
 }
-

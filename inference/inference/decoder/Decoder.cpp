@@ -41,7 +41,6 @@ DecoderFactory::DecoderFactory(
   if (alphabetSize_ == 0) {
     throw std::invalid_argument("Invalid letter dictionary.");
   }
-  std::cerr << "[Letters] " << alphabetSize_ << " tokens loaded.\n";
   silence_ = letterMap_.getIndex(silenceToken);
   blank_ =
       letterMap_.contains(kBlankToken) ? letterMap_.getIndex(kBlankToken) : -1;
@@ -56,7 +55,6 @@ DecoderFactory::DecoderFactory(
     if (nWords == 0) {
       throw std::invalid_argument("Invalid word dictionary.");
     }
-    std::cerr << "[Words] " << nWords << " words loaded.\n";
     unk_ = wordMap_.getIndex(kUnkToken);
   }
 
